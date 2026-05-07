@@ -66,5 +66,10 @@ const apiRoutes = {
     load: () => import("./endpoints/api/reviewsList"),
     handler: (m: any) => m.reviewsList,
     anonymous: true,
-  }
+  },
+  reviewsListAll: {
+    load: () => import("./endpoints/api/reviewsListAll"),
+    handler: (m: any) => m.reviewsListAll,
+    anonymous: true,
+  },
 } as const;

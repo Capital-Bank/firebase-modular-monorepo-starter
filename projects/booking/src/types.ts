@@ -16,6 +16,7 @@ export type StayDoc = {
 
 export type ReviewDocument = {
   reviewId: string;
+  stayId: string;
   uid: string;
   rating: 1 | 2 | 3 | 4 | 5;
   comment: string;

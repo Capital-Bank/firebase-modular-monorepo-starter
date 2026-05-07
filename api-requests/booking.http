@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "2acd039a-5367-45e3-978f-712e1148cfb3",
+    "stayId": "ad99c582-4083-40c9-8715-e457d939e98b",
     "uid": "demo-user",
     "rating": 5,
     "comment": "My pet had a great service"
@@ -71,6 +71,16 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "2acd039a-5367-45e3-978f-712e1148cfb3"
+    "stayId": "ad99c582-4083-40c9-8715-e457d939e98b"
+  }
+}
+
+### Booking: reviewsListAll
+POST {{function_url}}/api_booking/reviewsListAll
+Content-Type: application/json
+
+{
+  "data": {
+    "limit": 20
   }
 }

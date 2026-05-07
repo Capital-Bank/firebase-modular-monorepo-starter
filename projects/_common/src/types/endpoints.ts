@@ -36,6 +36,7 @@ export const BOOKING_API_ENDPOINTS = {
   stayCancel: "stayCancel",
   reviewCreate: "reviewCreate",
   reviewsList: "reviewsList",
+  reviewsListAll: "reviewsListAll",
 } as const;
 
 export type BookingApiEndpoint = (typeof BOOKING_API_ENDPOINTS)[keyof typeof BOOKING_API_ENDPOINTS];
@@ -114,6 +115,22 @@ export type BookingReviewsListOutput = {
   }>
 };
 
+export type BookingReviewsListAllInput = {
+  limit?: number;
+};
+
+export type BookingReviewsListAllOutput = {
+  reviews: Array<
+      {
+        reviewId: string;
+        stayId: string;
+        uid: string;
+        rating: number;
+        comment: string;
+        createdAt?: unknown;
+      }>;
+};
+
 export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.hello]: ApiEndpointDef<{}, { ok: true; message: string }, "anonymous">;
   [BOOKING_API_ENDPOINTS.availabilityList]: ApiEndpointDef<
@@ -146,6 +163,12 @@ export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.reviewsList]: ApiEndpointDef<
       BookingReviewsListInput,
       BookingReviewsListOutput,
+      "anonymous"
+  >;
+
+  [BOOKING_API_ENDPOINTS.reviewsListAll]: ApiEndpointDef<
+      BookingReviewsListAllInput,
+      BookingReviewsListAllOutput,
       "anonymous"
   >;
 
