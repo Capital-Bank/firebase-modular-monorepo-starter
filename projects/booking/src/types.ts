@@ -13,3 +13,11 @@ export type StayDoc = {
   updatedAt: FirebaseFirestore.Timestamp | FirebaseFirestore.FieldValue;
   expiresAt: FirebaseFirestore.Timestamp;
 };
+
+export type ReviewDocument = {
+  reviewId: string;
+  uid: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  comment: string;
+  createdAt: FirebaseFirestore.Timestamp | FirebaseFirestore.FieldValue;
+}

@@ -51,3 +51,26 @@ Content-Type: application/json
     "limit": 20
   }
 }
+
+### Create a review
+POST {{function_url}}/api_booking/reviewCreate
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "2acd039a-5367-45e3-978f-712e1148cfb3",
+    "uid": "demo-user",
+    "rating": 5,
+    "comment": "My pet had a great service"
+    }
+}
+
+### List reviews for a stay
+POST {{function_url}}/api_booking/reviewsList
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "2acd039a-5367-45e3-978f-712e1148cfb3"
+  }
+}
