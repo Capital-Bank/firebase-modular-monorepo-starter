@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "ad99c582-4083-40c9-8715-e457d939e98b",
+    "stayId": "1",
     "uid": "demo-user",
     "rating": 5,
     "comment": "My pet had a great service"
@@ -71,7 +71,7 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "ad99c582-4083-40c9-8715-e457d939e98b"
+    "stayId": "1"
   }
 }
 
@@ -83,4 +83,47 @@ Content-Type: application/json
   "data": {
     "limit": 20
   }
+}
+
+### Booking: reviewSeed (anonymous playground helper)
+POST {{function_url}}/api_booking/reviewSeed
+Content-Type: application/json
+
+{
+  "data": {
+    "numberOfStays": 5,
+    "reviewsPerStay": 4
+  }
+}
+
+### Booking: reviewsFiltered - top rated(4 or above)
+POST {{function_url}}/api_booking/reviewsFiltered
+Content-Type: application/json
+
+{
+  "data": {
+    "minRating": 4,
+    "maxRating": 5,
+    "limit": 20
+  }
+}
+
+### Booking: reviewsFiltered - low rated(2 or below)
+POST {{function_url}}/api_booking/reviewsFiltered
+Content-Type: application/json
+
+{
+  "data": {
+    "minRating": 1,
+    "maxRating": 2,
+    "limit": 20
+  }
+}
+
+### Booking: reviewsFiltered - All reviews (no filter, defualts)
+POST {{function_url}}/api_booking/reviewsFiltered
+Content-Type: application/json
+
+{
+  "data": {}
 }

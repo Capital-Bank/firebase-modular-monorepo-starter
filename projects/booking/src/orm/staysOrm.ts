@@ -13,7 +13,7 @@ export async function createPendingStay(opts: {
   endDate: string;
   ttlMinutes: number;
 }): Promise<{ stayId: string; status: "pending" }> {
-  const stayId = randomUUID();
+  const stayId = '1';
   const db = getDb();
 
   const expiresAt = new Timestamp(
