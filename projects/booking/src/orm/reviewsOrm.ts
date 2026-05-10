@@ -34,24 +34,42 @@ export async function createReview(opts: BookingReviewCreateInput): Promise <{ r
         };
 
     const subColRef = db
-        .collection("stays").doc(opts.uid)
+        .collection("stays").doc(opts.stayId)
         .collection("reviews").doc(reviewId);
 
     const topColRef = db.
         collection('reviews').doc(reviewId);
 
-    await db.collection("stays").doc(opts.stayId)
-        .collection("reviews").doc(reviewId)
-        .set(doc);
+    const existingSnap = await db
+        .collection("stays").doc(opts.stayId)
+        .collection("reviews")
+        .get(); // get all of the reviews for this stay
+
+    const existingRatings = existingSnap.docs.map((d) =>
+    {
+        const data = d.data() as any;
+        return typeof data.rating === "number" ? data.rating : 0;
+    });
+
+    const allRatings = [...existingRatings, opts.rating];
+    const averageRatings = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length; // explain later
+    const reviewCount = allRatings.length;
+
 
     const batch = db.batch();
     batch.set(subColRef, doc)
     batch.set(topColRef, doc);
+    batch.update(db.collection("stays").doc(opts.stayId), {
+        averageRating: Math.round(averageRatings * 10) / 10,
+        reviewCount,
+        updatedAt: FieldValue.serverTimestamp(),
+    }); // update average rating in stay collection for particula stay
+
     await batch.commit();
 
     return { reviewId }
 }
-
+// list review per stay
 export async function listReviews(opts: BookingReviewsListInput): Promise<BookingReviewsListOutput> {
     const db = getDb();
 
@@ -73,7 +91,7 @@ export async function listReviews(opts: BookingReviewsListInput): Promise<Bookin
         })
     }
 }
-
+// list all reviews
 export async function listAllReviews(opts: { limit: number }): Promise<BookingReviewsListAllOutput> {
     const db = getDb();
 
@@ -128,6 +146,9 @@ export async function seedReviews(opts: {
         const tier = i % tiers;
         const ratingPool = RATING_POOLS[tier];
 
+        const ratingsForStay = Array.from({length: opts.reviewsPerStay}, (_, j) => ratingPool[j % ratingPool.length]);
+        const averageRating = Math.round((ratingsForStay.reduce((sum, r) => sum + r, 0) / ratingsForStay.length) * 10) / 10 ;
+// return to this later, give a good look and why not with number of reviews and why fixed 10 or becuase is seeder.
         // Write the stay document directly — seeder bypasses business logic validation
         const stayRef = db.collection("stays").doc(stayId);
         await stayRef.set({
@@ -137,6 +158,8 @@ export async function seedReviews(opts: {
             startDate: "2026-05-01",
             endDate: "2026-05-07",
             status: "confirmed",
+            averageRating,
+            reviewCount: opts.reviewsPerStay,
             createdAt: FieldValue.serverTimestamp(),
             updatedAt: FieldValue.serverTimestamp(),
             expiresAt: null,

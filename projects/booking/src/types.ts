@@ -2,13 +2,15 @@ export * from "@starter/common";
 
 export type StayStatus = "pending" | "confirmed" | "cancelled" | "expired";
 
-export type StayDoc = {
+export type StayDocument = {
   stayId: string;
   uid: string;
   petName: string;
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
   status: StayStatus;
+  averageRating?: number;
+  reviewCount?: number;
   createdAt: FirebaseFirestore.Timestamp | FirebaseFirestore.FieldValue;
   updatedAt: FirebaseFirestore.Timestamp | FirebaseFirestore.FieldValue;
   expiresAt: FirebaseFirestore.Timestamp;

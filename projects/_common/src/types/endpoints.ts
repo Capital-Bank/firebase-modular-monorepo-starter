@@ -39,6 +39,7 @@ export const BOOKING_API_ENDPOINTS = {
   reviewsListAll: "reviewsListAll",
   reviewSeed: "reviewSeed",
   reviewsFiltered: "reviewsFiltered",
+  staysByRating: "staysByRating",
 } as const;
 
 export type BookingApiEndpoint = (typeof BOOKING_API_ENDPOINTS)[keyof typeof BOOKING_API_ENDPOINTS];
@@ -162,6 +163,20 @@ export type BookingReviewFilteredOutput = {
       }>;
 };
 
+export type BookingStaysByRatingInput = {
+  order: | "asc" | "desc";
+  limit?: number;
+}
+
+export type BookingStaysByRatingOutput = {
+  stays: Array<{
+    stayId: string;
+    petName: string;
+    averageRating: number;
+    reviewCount: number;
+  }>;
+};
+
 export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.hello]: ApiEndpointDef<{}, { ok: true; message: string }, "anonymous">;
   [BOOKING_API_ENDPOINTS.availabilityList]: ApiEndpointDef<
@@ -214,6 +229,12 @@ export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
       BookingReviewFilteredOutput,
       "anonymous"
   >;
+
+  [BOOKING_API_ENDPOINTS.staysByRating]: ApiEndpointDef<
+      BookingStaysByRatingInput,
+      BookingStaysByRatingOutput,
+      "anonymous"
+  >
 
   // Planned (spec-first) endpoints (to be implemented):
   [BOOKING_API_ENDPOINTS.stayCancel]: ApiEndpointDef<any, any, "anonymous">;

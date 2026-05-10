@@ -58,11 +58,11 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "1",
+    "stayId": "df576e3f-3223-4f14-9d87-77421f0b398c",
     "uid": "demo-user",
-    "rating": 5,
+    "rating": 1,
     "comment": "My pet had a great service"
-    }
+  }
 }
 
 ### List reviews for a stay
@@ -126,4 +126,26 @@ Content-Type: application/json
 
 {
   "data": {}
+}
+
+### Booking: staysByRating — highest rated stays
+POST {{function_url}}/api_booking/staysByRating
+Content-Type: application/json
+
+{
+  "data": {
+    "order": "desc",
+    "limit": 10
+  }
+}
+
+### Booking: staysByRating — lowest rated stays
+POST {{function_url}}/api_booking/staysByRating
+Content-Type: application/json
+
+{
+  "data": {
+    "order": "asc",
+   "limit": 10
+  }
 }
