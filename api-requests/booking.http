@@ -149,3 +149,13 @@ Content-Type: application/json
    "limit": 10
   }
 }
+
+### Booking: stayCancel
+POST {{function_url}}/api_booking/stayCancel
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "SOME STAY ID"
+  }
+}

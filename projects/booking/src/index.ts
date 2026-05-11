@@ -57,6 +57,11 @@ const apiRoutes = {
         handler: (m: any) => m.staysList,
         anonymous: true,
     },
+    stayCancel: {
+        load: () => import("./endpoints/api/stayCancel"),
+        handler: (m:any) => m.stayCancel,
+        anonymous: true,
+    },
     reviewCreate: {
         load: () => import("./endpoints/api/reviewCreate"),
         handler: (m: any) => m.reviewCreate,
@@ -82,7 +87,6 @@ const apiRoutes = {
         handler: (m: any) => m.reviewsFiltered,
         anonymous: true,
     },
-
     staysByRating: {
         load: () => import("./endpoints/api/staysByRating"),
         handler: (m: any) => m.staysByRating,

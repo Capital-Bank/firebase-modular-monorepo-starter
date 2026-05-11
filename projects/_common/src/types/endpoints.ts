@@ -177,6 +177,15 @@ export type BookingStaysByRatingOutput = {
   }>;
 };
 
+export type BookingStayCancelInput = {
+  stayId: string;
+}
+
+export type BookingStayCancelOutput = {
+  stayId: string;
+  status: "cancelled";
+}
+
 export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.hello]: ApiEndpointDef<{}, { ok: true; message: string }, "anonymous">;
   [BOOKING_API_ENDPOINTS.availabilityList]: ApiEndpointDef<
@@ -236,6 +245,9 @@ export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
       "anonymous"
   >
 
-  // Planned (spec-first) endpoints (to be implemented):
-  [BOOKING_API_ENDPOINTS.stayCancel]: ApiEndpointDef<any, any, "anonymous">;
+  [BOOKING_API_ENDPOINTS.stayCancel]: ApiEndpointDef<
+      BookingStayCancelInput,
+      BookingStayCancelOutput,
+      "anonymous"
+  >
 }

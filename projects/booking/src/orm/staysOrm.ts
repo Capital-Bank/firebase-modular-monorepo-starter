@@ -77,6 +77,55 @@ export async function createPendingStay(opts: {
     return {stayId, status: "pending"};
 }
 
+export async function cancelStay(opts: { stayId: string }): Promise<{ stayId: string; status: "cancelled" }> {
+    const db = getDb();
+
+    await db.runTransaction(async (tx) => {
+        const stayRef = db.collection("stays").doc(opts.stayId);
+        const staySnap = await tx.get(stayRef);
+
+        if (!staySnap.exists) {
+            throw new Error(`Stay ${opts.stayId} not found`);
+        }
+
+        const data = staySnap.data() as any;
+        const status = data.status as StayStatus;
+
+        if (status === "cancelled") return;
+
+        if (status !== "pending" && status !== "confirmed") {
+            throw new Error(`Stay cannot be cancelled (status: ${status})`);
+        }
+
+        const dates = listIsoDatesInclusive(data.startDate, data.endDate);
+        const availabilityRefs = dates.map((date) => db.collection("availability").doc(date));
+        const availabilitySnaps = await Promise.all(availabilityRefs.map((ref) => tx.get(ref)));
+
+        tx.update(stayRef, {
+            status: "cancelled",
+            updatedAt: FieldValue.serverTimestamp(),
+        });
+
+        for (let i = 0; i < availabilityRefs.length; i++) {
+            if (availabilitySnaps[i].exists) {
+                tx.set(
+                    availabilityRefs[i],
+                    {
+                        reservedCount: FieldValue.increment(-1),
+                        updatedAt: FieldValue.serverTimestamp(),
+                    },
+                    { merge: true },
+                );
+            }
+        }
+
+        // TODO: publish notification.ready_to_send (template: stay_cancelled)
+        // when Pub/Sub is setup chek this up — see docs/CONTRACTS_V1.md
+    });
+
+    return { stayId: opts.stayId, status: "cancelled" };
+}
+
 export async function listStaysByRating(opts: {
     order: "asc" | "desc";
     limit: number;
