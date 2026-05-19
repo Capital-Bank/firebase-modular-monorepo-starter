@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {
   "data": {
-    "stayId": "df576e3f-3223-4f14-9d87-77421f0b398c",
+    "stayId": "1339cd3b-cea2-4f01-a1aa-7530f35adee4",
     "uid": "demo-user",
     "rating": 1,
     "comment": "My pet had a great service"
@@ -157,5 +157,62 @@ Content-Type: application/json
 {
   "data": {
     "stayId": "SOME STAY ID"
+  }
+}
+
+### Booking: availabilitySeed (anonymous playground helper)
+POST https://us-central1-fir-play-2020.cloudfunctions.net/api_booking/availabilitySeed
+Content-Type: application/json
+
+{
+  "data": {
+    "fromDate": "2026-05-01",
+    "days": 7,
+    "capacity": 10
+  }
+}
+
+### Stay seeder (production)
+POST https://us-central1-fir-play-2020.cloudfunctions.net/api_booking/reviewSeed
+Content-Type: application/json
+
+{
+"data": {
+"numberOfStays": 5,
+"reviewsPerStay": 4
+}
+}
+
+### Create review (production)
+POST https://us-central1-fir-play-2020.cloudfunctions.net/api_booking/reviewCreate
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "87237183-5a7b-4f84-b44e-0877bf11ebb7",
+    "uid": "demo-user",
+    "rating": 1,
+    "comment": "My pet had a great service"
+  }
+}
+
+### Booking: reviewsListAll
+POST https://us-central1-fir-play-2020.cloudfunctions.net/api_booking/reviewsListAll
+Content-Type: application/json
+
+{
+  "data": {
+    "limit": 20
+  }
+}
+
+### Booking: reviewSeed (anonymous playground helper)
+POST https://us-central1-fir-play-2020.cloudfunctions.net/api_booking/reviewSeed
+Content-Type: application/json
+
+{
+  "data": {
+    "numberOfStays": 5,
+    "reviewsPerStay": 4
   }
 }

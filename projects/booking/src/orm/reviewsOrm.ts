@@ -2,13 +2,16 @@ import { FieldValue} from "firebase-admin/firestore";
 import { randomUUID } from "node:crypto";
 
 import { getDb } from "./firestore";
-import {BookingReviewsListOutput, type ReviewDocument} from "../types";
-import type {
+import type { ReviewDocument } from "../types";
+import {
+    BookingReviewsListOutput,
     BookingReviewCreateInput,
     BookingReviewsListAllOutput,
     BookingReviewSeedOutput,
     BookingReviewsListInput,
-    BookingReviewFilteredOutput
+    BookingReviewFilteredOutput,
+    publishMessage,
+    PUBSUB_TOPIC
 } from "@starter/common";
 
 
@@ -66,6 +69,14 @@ export async function createReview(opts: BookingReviewCreateInput): Promise <{ r
     }); // update average rating in stay collection for particula stay
 
     await batch.commit();
+
+    await publishMessage(PUBSUB_TOPIC.reviewCreated, {
+        eventId: `reviewCreated: ${reviewId}`,
+        uid: opts.uid,
+        stayId: opts.stayId,
+        reviewId,
+        rating: opts.rating,
+    });
 
     return { reviewId }
 }

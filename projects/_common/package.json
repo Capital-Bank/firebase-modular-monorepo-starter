@@ -12,7 +12,8 @@
     "build:watch": "tsc -b -w"
   },
   "dependencies": {
-    "firebase-functions": "^7.0.5"
+    "firebase-functions": "^7.0.5",
+    "@google-cloud/pubsub": "^4.9.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

@@ -13,7 +13,7 @@
     "deploy": "firebase deploy --only functions:notifications"
   },
   "dependencies": {
-    "@starter/common": "0.1.0",
+    "@starter/common": "file:./starter-common-0.1.0.tgz",
     "firebase-admin": "^13.6.1",
     "firebase-functions": "^7.0.5"
   },

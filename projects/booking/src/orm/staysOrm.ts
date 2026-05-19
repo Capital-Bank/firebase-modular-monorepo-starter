@@ -1,9 +1,10 @@
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {randomUUID} from "node:crypto";
+import { PUBSUB_TOPIC, publishMessage } from "@starter/common/";
 
 import {getDb} from "./firestore";
 
-import type {StayDocument, StayStatus} from "../types";
+import { StayDocument, StayStatus} from "../types";
 import {listIsoDatesInclusive} from "../utils";
 
 export async function createPendingStay(opts: {
@@ -73,6 +74,14 @@ export async function createPendingStay(opts: {
 
         tx.set(docRef, doc);
     });
+
+    await publishMessage(PUBSUB_TOPIC.stayCreated, {
+        eventId: `stay_created: ${stayId}`,
+        uid: opts.uid,
+        stayId
+    });
+
+    console.log("[pubsub] publish stay created: ", stayId);
 
     return {stayId, status: "pending"};
 }

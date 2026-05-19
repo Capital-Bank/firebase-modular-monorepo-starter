@@ -3,6 +3,10 @@
     {
       "source": "projects/booking",
       "codebase": "booking",
+      "predeploy": [
+        "npm run build --prefix .",
+        "cd projects/_common && npm pack --pack-destination ../booking && cp ../booking/starter-common-0.1.0.tgz ../notifications/"
+      ],
       "ignore": [
         "**/node_modules/**",
         "**/__tests__/**",

@@ -15,7 +15,7 @@ import {get401Error, routeCallable} from "@starter/common";
  * - file renames/moves become behavior changes
  * - reviewers lose a single obvious allowlist to audit
  */
-export const api_booking = onCall(async (request) => {
+export const api_booking = onCall({ invoker: "public" }, async (request) => {
     return routeCallable({
         request,
         routes: apiRoutes,
