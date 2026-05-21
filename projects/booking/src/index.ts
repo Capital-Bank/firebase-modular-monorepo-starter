@@ -1,6 +1,8 @@
 import {onCall} from "firebase-functions/v2/https";
+import {onSchedule} from "firebase-functions/v2/scheduler";
 
 import {get401Error, routeCallable} from "@starter/common";
+import {releaseExpiredHolds} from "./orm/staysOrm";
 
 /**
  * `api_booking` is a single callable gateway that hosts multiple internal endpoints.
@@ -27,6 +29,10 @@ export const api_booking = onCall({ invoker: "public" }, async (request) => {
             return await executableFunc(_request);
         },
     });
+});
+
+export const auto_releaseExpiredHolds = onSchedule("every 5 minutes", async () => {
+    await releaseExpiredHolds();
 });
 
 const apiRoutes = {

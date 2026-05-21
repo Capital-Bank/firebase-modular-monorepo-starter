@@ -166,6 +166,31 @@ export async function listStaysByRating(opts: {
     });
 }
 
+export async function releaseExpiredHolds(): Promise<{ expiredCount: number }> {
+    const db = getDb();
+    const now = Timestamp.now();
+
+    const snap = await db
+        .collection("stays")
+        .where("status", "==", "pending")
+        .where("expiresAt", "<=", now)
+        .get();
+
+    if (snap.empty) return { expiredCount: 0 };
+
+    const batch = db.batch();
+    for (const doc of snap.docs) {
+        batch.update(doc.ref, {
+            status: "expired",
+            updatedAt: FieldValue.serverTimestamp(),
+        });
+    }
+    await batch.commit();
+
+    console.log(`[scheduler] expired ${snap.size} pending stays`);
+    return { expiredCount: snap.size };
+}
+
 export async function listStays(opts: { limit: number }): Promise<
     Array<{
         stayId: string;
