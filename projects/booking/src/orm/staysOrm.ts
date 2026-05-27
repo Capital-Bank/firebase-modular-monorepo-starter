@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { getDb } from "./firestore";
 
 import type { StayDoc, StayStatus } from "../types";
-import { listIsoDatesInclusive } from "../utils";
+import { get400Error, listIsoDatesInclusive } from "../utils";
 
 export async function createPendingStay(opts: {
   uid: string;
@@ -107,4 +107,95 @@ export async function listStays(opts: { limit: number }): Promise<
       createdAt: data.createdAt,
     };
   });
+}
+export async function getStayDetails(opts: {stayId:string}): Promise<
+ {
+    stayId: string;
+    uid: string;
+    petName: string;
+    startDate: string;
+    endDate: string;
+    status: StayStatus;
+    createdAt?: FirebaseFirestore.Timestamp;
+  }
+  >{
+     const db = getDb()
+     const document = await db.collection("stays").doc(opts.stayId).get()
+     if(!document.exists){
+      throw get400Error("No document found")
+     }
+     const d = document.data() as any
+     return {
+      stayId: String(d.stayId || d.id),
+      uid: String(d.uid || ""),
+      petName: String(d.petName || ""),
+      startDate: String(d.startDate || ""),
+      endDate: String(d.endDate || ""),
+      status: (d.status || "pending") as StayStatus,
+      createdAt: d.createdAt,
+    };
+  }
+export async function cancelStay(opts: { stayId: string }): Promise<{
+  stayId: string;
+  status: "cancelled";
+}> {
+  const db = getDb();
+  const stayRef = db.collection("stays").doc(opts.stayId);
+
+  await db.runTransaction(async (tx) => {
+    const staySnap = await tx.get(stayRef);
+    if (!staySnap.exists) {
+      throw new Error(`Stay not found: ${opts.stayId}`);
+    }
+
+    const stay = staySnap.data() as Partial<StayDoc> | undefined;
+    const status = stay?.status;
+
+    if (status === "cancelled") {
+      return;
+    }
+    if (status === "expired") {
+      throw new Error(`Stay is already expired: ${opts.stayId}`);
+    }
+    if (status !== "pending" && status !== "confirmed") {
+      throw new Error(`Stay cannot be cancelled from status: ${String(status)}`);
+    }
+    if (typeof stay?.startDate !== "string" || typeof stay?.endDate !== "string") {
+      throw new Error(`Stay has invalid date range: ${opts.stayId}`);
+    }
+
+    
+    const availabilityRefs = listIsoDatesInclusive(stay.startDate, stay.endDate).map((date) => ({
+      date,
+      ref: db.collection("availability").doc(date),
+    }));
+    const availabilitySnaps = await Promise.all(availabilityRefs.map(({ ref }) => tx.get(ref)));
+
+    for (let i = 0; i < availabilityRefs.length; i++) {
+      const { date } = availabilityRefs[i];
+      const data = availabilitySnaps[i].data() as any;
+      const reservedCount = typeof data?.reservedCount === "number" ? data.reservedCount : 0;
+      if (reservedCount < 1) {
+        throw new Error(`Cannot release capacity for date ${date}`);
+      }
+    }
+
+    for (const { ref } of availabilityRefs) {
+      tx.set(
+        ref,
+        {
+          reservedCount: FieldValue.increment(-1),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
+
+    tx.update(stayRef, {
+      status: "cancelled",
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  });
+
+  return { stayId: opts.stayId, status: "cancelled" };
 }

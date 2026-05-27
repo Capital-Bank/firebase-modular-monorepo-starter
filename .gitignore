@@ -11,3 +11,4 @@ reports/
 .firebase/
 .idea
 http-client.private.env.json
+api-requests/*.local.http

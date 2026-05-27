@@ -57,4 +57,14 @@ const apiRoutes = {
     handler: (m: any) => m.staysList,
     anonymous: true,
   },
+  stayCancel: {
+    load: () => import("./endpoints/api/stayCancel"),
+    handler: (m: any) => m.stayCancel,
+    anonymous: true,
+  },
+  stayDetails: {
+    load: () => import("./endpoints/api/stayDetails"),
+    handler: (m: any) => m.stayDetails,
+    anonymous: true,
+  },
 } as const;

@@ -51,3 +51,24 @@ Content-Type: application/json
     "limit": 20
   }
 }
+### Booking: stayCancel
+POST {{function_url}}/api_booking/stayCancel
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "<stayId>"
+  }
+}
+
+### Booking: stayDetails
+
+POST {{function_url}}/api_booking/stayDetails
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "<stayId>"
+  }
+}
+
