@@ -1,3 +1,4 @@
+
 ### Booking: hello (anonymous)
 POST {{function_url}}/api_booking/hello
 Content-Type: application/json
@@ -72,3 +73,23 @@ Content-Type: application/json
   }
 }
 
+### Booking: stayNoteCreate
+POST {{function_url}}/api_booking/stayNoteCreate
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "<stayId>",
+    "text": "Owner said Milo is afraid of loud noises."
+  }
+}
+
+### Booking: stayNotesList
+POST {{function_url}}/api_booking/stayNotesList
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "<stayId>"
+  }
+}

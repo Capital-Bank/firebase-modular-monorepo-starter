@@ -35,6 +35,8 @@ export const BOOKING_API_ENDPOINTS = {
   staysList: "staysList",
   stayCancel: "stayCancel",
   stayDetails: "stayDetails",
+  stayNoteCreate: "stayNoteCreate",
+  stayNotesList: "stayNotesList",
 } as const;
 
 export type BookingApiEndpoint = (typeof BOOKING_API_ENDPOINTS)[keyof typeof BOOKING_API_ENDPOINTS];
@@ -90,11 +92,13 @@ export type BookingStaysListOutput = {
 
 export type BookingStayCancelInput = {
   stayId: string;
+  reason?: string
 };
 
 export type BookingStayCancelOutput = {
   stayId: string;
   status: "cancelled";
+
 };
 
 export type BookingStayDetailsInput = {
@@ -111,6 +115,29 @@ export type BookingStayDetailsOutput = {
     status: "pending" | "confirmed" | "cancelled" | "expired";
     createdAt?: unknown;
   };
+};
+
+export type BookingStayNoteCreateInput = {
+  stayId: string
+  text: string
+}
+
+export type BookingStayNoteCreateOutput = {
+  stayId: string
+  noteId: string
+}
+
+export type BookingStayNotesListInput = {
+  stayId: string;
+};
+
+export type BookingStayNotesListOutput = {
+  notes: Array<{
+    noteId: string;
+    stayId: string;
+    text: string;
+    createdAt?: unknown;
+  }>;
 };
 
 export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
@@ -143,6 +170,16 @@ export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.stayDetails]: ApiEndpointDef<
     BookingStayDetailsInput,
     BookingStayDetailsOutput,
+    "anonymous"
+  >;
+  [BOOKING_API_ENDPOINTS.stayNoteCreate]: ApiEndpointDef<
+    BookingStayNoteCreateInput,
+    BookingStayNoteCreateOutput,
+    "anonymous"
+  >;
+  [BOOKING_API_ENDPOINTS.stayNotesList]: ApiEndpointDef<
+    BookingStayNotesListInput,
+    BookingStayNotesListOutput,
     "anonymous"
   >;
 }

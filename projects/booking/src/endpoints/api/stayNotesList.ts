@@ -2,20 +2,21 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 
 import { get400Error } from "../../utils";
 import { BOOKING_API_ENDPOINTS, type BookingApiEndpointTypeMap } from "../../types";
-import { cancelStay } from "../../orm/staysOrm";
+import { listStayNotes } from "../../orm/staysOrm";
 
-const apiEndpoint = BOOKING_API_ENDPOINTS.stayCancel;
+const apiEndpoint = BOOKING_API_ENDPOINTS.stayNotesList;
 type InOut = BookingApiEndpointTypeMap[typeof apiEndpoint];
 type Params = InOut["input"];
 type Result = InOut["output"];
 
-export async function stayCancel(request: CallableRequest<any>): Promise<Result> {
+export async function stayNotesList(request: CallableRequest<any>): Promise<Result> {
   const params = validateParams(request.data);
 
   try {
-    return await cancelStay(params);
+    const notes = await listStayNotes(params);
+    return { notes };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to cancel stay";
+    const message = error instanceof Error ? error.message : "Unable to list stay notes";
     throw get400Error(message);
   }
 }
@@ -27,7 +28,7 @@ function validateParams(input: unknown): Params {
 
   const keys = Object.keys(input as Record<string, unknown>);
   for (const key of keys) {
-    if (key !== "stayId" && key !== "reason") {
+    if (key !== "stayId") {
       throw get400Error(`Unknown param: ${key}`);
     }
   }
@@ -36,14 +37,6 @@ function validateParams(input: unknown): Params {
   if (typeof stayId !== "string" || !stayId.trim()) {
     throw get400Error("stayId is required");
   }
-  const reason = (input as any).reason
-  if(reason !== undefined && typeof reason !== "string"){
-    throw get400Error("reason must be string")
-  }
-  
 
-  return { 
-    stayId: stayId.trim(),
-    reason: typeof reason === "string" ? reason.trim() : undefined
-  };
+  return { stayId: stayId.trim() };
 }

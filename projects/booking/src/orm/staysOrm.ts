@@ -135,9 +135,10 @@ export async function getStayDetails(opts: {stayId:string}): Promise<
       createdAt: d.createdAt,
     };
   }
-export async function cancelStay(opts: { stayId: string }): Promise<{
+export async function cancelStay(opts: { stayId: string, reason?:string}): Promise<{
   stayId: string;
   status: "cancelled";
+
 }> {
   const db = getDb();
   const stayRef = db.collection("stays").doc(opts.stayId);
@@ -195,7 +196,69 @@ export async function cancelStay(opts: { stayId: string }): Promise<{
       status: "cancelled",
       updatedAt: FieldValue.serverTimestamp(),
     });
+    const eventRef = stayRef.collection("events").doc()
+    tx.set(eventRef, {
+      type: "cancelled",
+      stayId:opts.stayId,
+      reason: opts.reason || null,
+      createdat: FieldValue.serverTimestamp()
+    })
+
   });
 
   return { stayId: opts.stayId, status: "cancelled" };
+}
+export async function createStayNote(opts: {stayId: string; text:string}): Promise<{stayId: string; noteId:string}>  {
+  const db = getDb()
+
+  const stayRef = db.collection("stays").doc(opts.stayId)
+  const staySnap = await stayRef.get()
+  
+  if(!staySnap.exists) {
+    throw get400Error(`Stay not found: ${opts.stayId}`)
+  }
+  const noteRef = stayRef.collection("notes").doc()
+  await noteRef.set({
+    stayId: opts.stayId,
+    text: opts.text,
+    createdAt: FieldValue.serverTimestamp()
+  })
+
+  return {
+    stayId:opts.stayId,
+    noteId:  noteRef.id
+  }
+}
+
+export async function listStayNotes(opts: { stayId: string }): Promise<
+  Array<{
+    noteId: string;
+    stayId: string;
+    text: string;
+    createdAt?: FirebaseFirestore.Timestamp;
+  }>
+> {
+  const db = getDb();
+
+  const stayRef = db.collection("stays").doc(opts.stayId);
+  const staySnap = await stayRef.get();
+
+  if (!staySnap.exists) {
+    throw get400Error(`Stay not found: ${opts.stayId}`);
+  }
+
+  const notesSnap = await stayRef
+    .collection("notes")
+    .orderBy("createdAt", "desc")
+    .get();
+
+  return notesSnap.docs.map((doc) => {
+    const data = doc.data() as any;
+    return {
+      noteId: doc.id,
+      stayId: String(data.stayId || opts.stayId),
+      text: String(data.text || ""),
+      createdAt: data.createdAt,
+    };
+  });
 }
