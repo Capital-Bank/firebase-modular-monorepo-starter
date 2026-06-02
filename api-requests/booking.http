@@ -93,3 +93,13 @@ Content-Type: application/json
     "stayId": "<stayId>"
   }
 }
+
+### Booking: stayEventsList
+POST {{function_url}}/api_booking/stayEventsList
+Content-Type: application/json
+
+{
+  "data": {
+    "stayId": "<stayId>"
+  }
+}

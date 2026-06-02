@@ -201,7 +201,7 @@ export async function cancelStay(opts: { stayId: string, reason?:string}): Promi
       type: "cancelled",
       stayId:opts.stayId,
       reason: opts.reason || null,
-      createdat: FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     })
 
   });
@@ -258,6 +258,39 @@ export async function listStayNotes(opts: { stayId: string }): Promise<
       noteId: doc.id,
       stayId: String(data.stayId || opts.stayId),
       text: String(data.text || ""),
+      createdAt: data.createdAt,
+    };
+  });
+}
+
+export async function listStayEvents(opts: {stayId:string}): Promise<Array<{
+    eventId:string
+    type: string;
+    stayId:string
+    reason: string;
+    createdAt?: unknown;
+  }>> {
+    const db = getDb()
+
+    const stayRef= db.collection("stays").doc(opts.stayId)
+    const staySnap = await stayRef.get()
+
+    if (!staySnap.exists) {
+    throw get400Error(`Stay not found: ${opts.stayId}`);
+  }
+
+  const eventsSnap = await stayRef
+    .collection("events")
+    .orderBy("createdAt", "desc")
+    .get();
+
+  return eventsSnap.docs.map((doc) => {
+    const data = doc.data() as any;
+    return {
+      eventId: doc.id,
+      type: String(data.type || ""),
+      stayId: String(data.stayId || opts.stayId),
+      reason: String(data.reason || ""),
       createdAt: data.createdAt,
     };
   });

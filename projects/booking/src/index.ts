@@ -77,4 +77,9 @@ const apiRoutes = {
     handler: (m: any) => m.stayNotesList,
     anonymous: true,
   },
+  stayEventsList: {
+    load: () => import("./endpoints/api/stayEventsList"),
+    handler: (m: any) => m.stayEventsList,
+    anonymous: true,
+  },
 } as const;

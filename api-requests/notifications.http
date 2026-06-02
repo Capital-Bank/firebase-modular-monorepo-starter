@@ -7,3 +7,18 @@ Content-Type: application/json
     "data": ""
   }
 }
+
+
+### Notifications: notificationList
+POST {{function_url}}/api_notifications/notificationList
+Content-Type: application/json
+
+{
+  "data": {
+    "limit": 10,
+    "sortBy": "createdAt",
+    "sortDirection": "desc",
+    "status": "sent",
+    "search": "stay_cancelled"
+  }
+}

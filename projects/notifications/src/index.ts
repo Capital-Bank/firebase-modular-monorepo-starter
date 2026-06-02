@@ -1,6 +1,6 @@
-import { onRequest } from "firebase-functions/v2/https";
+import { onCall, onRequest } from "firebase-functions/v2/https";
 
-import { get401Error, routeHttp } from "@starter/common";
+import { get401Error, routeCallable, routeHttp } from "@starter/common";
 
 /**
  * `subscribers_notifications` is a single HTTP gateway for Pub/Sub push deliveries.
@@ -22,9 +22,31 @@ export const subscribers_notifications = onRequest(async (request, response) => 
   return;
 });
 
+export const api_notifications = onCall(async (request) => {
+  return routeCallable({
+    request,
+    routes: apiRoutes,
+    unauthorized: get401Error,
+    executeOnCallFunction: async (_funcName, _request, executableFunc, isAnonymous) => {
+      if (!isAnonymous && !_request.auth) {
+        return Promise.reject(get401Error("Endpoint requires authentication"));
+      }
+      return await executableFunc(_request);
+    },
+  });
+});
 const subscriberRoutes = {
   notificationSend: {
     load: () => import("./endpoints/pubsub/notificationSend"),
     handler: (m: any) => m.notificationSend,
+  },
+
+} as const;
+
+const apiRoutes = {
+  notificationList: {
+    load: () => import("./endpoints/api/notificationList"),
+    handler: (m: any) => m.notificationList,
+    anonymous: true,
   },
 } as const;

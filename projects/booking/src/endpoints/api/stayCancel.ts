@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import type { CallableRequest } from "firebase-functions/v2/https";
 
 import { get400Error } from "../../utils";
 import { BOOKING_API_ENDPOINTS, type BookingApiEndpointTypeMap } from "../../types";
 import { cancelStay } from "../../orm/staysOrm";
+import { publishJson } from "../../pubsub";
 
 const apiEndpoint = BOOKING_API_ENDPOINTS.stayCancel;
 type InOut = BookingApiEndpointTypeMap[typeof apiEndpoint];
@@ -13,7 +15,17 @@ export async function stayCancel(request: CallableRequest<any>): Promise<Result>
   const params = validateParams(request.data);
 
   try {
-    return await cancelStay(params);
+    const result = await cancelStay(params);
+    await publishJson("notification.ready_to_send", {
+      eventId: randomUUID(),
+      stayId: params.stayId,
+      uid: "demo-user",
+      template: "stay_cancelled",
+      payload: {
+        reason: params.reason ??  null
+      }
+    })
+    return result
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to cancel stay";
     throw get400Error(message);

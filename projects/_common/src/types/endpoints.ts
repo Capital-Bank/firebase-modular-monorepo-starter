@@ -37,6 +37,7 @@ export const BOOKING_API_ENDPOINTS = {
   stayDetails: "stayDetails",
   stayNoteCreate: "stayNoteCreate",
   stayNotesList: "stayNotesList",
+  stayEventsList: "stayEventsList"
 } as const;
 
 export type BookingApiEndpoint = (typeof BOOKING_API_ENDPOINTS)[keyof typeof BOOKING_API_ENDPOINTS];
@@ -139,6 +140,19 @@ export type BookingStayNotesListOutput = {
     createdAt?: unknown;
   }>;
 };
+export type BookingStayEventsListInput = {
+  stayId: string;
+};
+
+export type BookingStayEventsListOutput = {
+  events: Array<{
+    eventId:string
+    type: string;
+    stayId:string
+    reason: string;
+    createdAt?: unknown;
+  }>;
+};
 
 export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
   [BOOKING_API_ENDPOINTS.hello]: ApiEndpointDef<{}, { ok: true; message: string }, "anonymous">;
@@ -182,4 +196,54 @@ export interface BookingApiEndpointTypeMap extends ApiEndpointTypeMap {
     BookingStayNotesListOutput,
     "anonymous"
   >;
+  [BOOKING_API_ENDPOINTS.stayEventsList]: ApiEndpointDef<
+    BookingStayEventsListInput,
+    BookingStayEventsListOutput,
+    "anonymous"
+  >;
+}
+
+// ---- notifications (callable) -----------------------------------------------------
+
+export const  NOTIFICATIONS_API_ENDPOINTS = {
+  notificationsList: "notificationsList"
+} as const;
+
+
+
+export type NotificationsApiEndpoint = (typeof NOTIFICATIONS_API_ENDPOINTS)[keyof typeof NOTIFICATIONS_API_ENDPOINTS];
+
+export type NotificationSortField = "createdAt" | "template" | "status";
+export type SortDirection = "asc" | "desc";
+export type NotificationListInput = {
+  limit?: number;
+  cursor?: string;
+  sortBy?: NotificationSortField;
+  sortDirection?: SortDirection;
+  search?: string;
+  status?: "sent" | "failed" | "received";
+  template?: "stay_cancelled";
+  stayId?: string;
+  uid?: string;
+};
+
+export type NotificationListOutput = {
+  notifications: Array<{
+    notificationId: string;
+    stayId: string;
+    uid: string;
+    template: string;
+    status: string;
+    payload?: unknown;
+    createdAt?: unknown;
+  }>;
+  nextCursor?: string;
+};
+export interface NotificationsApiEndpointTypeMap extends ApiEndpointTypeMap {
+  [NOTIFICATIONS_API_ENDPOINTS.notificationsList]: ApiEndpointDef<
+    NotificationListInput,
+    NotificationListOutput,
+    "anonymous"
+  >;
+  
 }
